@@ -11,7 +11,7 @@ class Provider(models.Model):
     phone_number = models.CharField(max_length=55)
     practice_name = models.CharField(max_length=255)
     practice_address = models.CharField(max_length=255)
-    provide_type = models.ForeignKey(ProviderType, on_delete=models.DO_NOTHING)
+    provider_type = models.ForeignKey(ProviderType, on_delete=models.DO_NOTHING)
 
     class Meta:
         ordering = (F('id').asc(nulls_last=True),)

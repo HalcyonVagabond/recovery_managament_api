@@ -4,7 +4,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from ..models import Appointment
+from ..models import Appointment, Provider, Client
 
 
 class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
@@ -15,13 +15,14 @@ class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
             view_name='appointment',
             lookup_field='id'
         )
-        fields = ('id', 'date_time', 'provider_id', 'client_id')
+        fields = ('id', 'date_time', 'duration', 'provider_id', 'client_id', 'client')
         depth = 2
 
 class Appointments(ViewSet):
 
     def list(self, request):
-        appointments = Appointment.objects.all()
+        provider = Provider.objects.get(user=request.auth.user)
+        appointments = Appointment.objects.filter(provider=provider)
         serializer = AppointmentSerializer(appointments, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -34,29 +35,21 @@ class Appointments(ViewSet):
         except Exception as ex:
             return HttpResponseServerError(ex)
 
+    def create(self, request):
+        new_appointment = Appointment()
+        print(request)
+        provider = Provider.objects.get(user=request.auth.user)
+        client = Client.objects.get(id=request.data["client_id"])
 
-    # Handle POST operations
-    # def create(self, request):
-    #     new_appointment = Appointment()
-    #     print("REQUESTDATA", new_appointment)
+        new_appointment.provider = provider
+        new_appointment.client = client
+        new_appointment.date_time = request.data["date_time"]
+        new_appointment.duration = request.data["duration"]
 
-    #     customer = Customer.objects.get(user=request.auth.user)
+        new_appointment.save()
 
-    #     new_Appointment.title = request.data["title"]
-    #     new_Appointment.customer = customer
-    #     new_Appointment.description = request.data["description"]
-    #     new_Appointment.quantity = request.data["quantity"]
-    #     new_Appointment.location = request.data["location"]
-    #     new_Appointment.image_path = request.data["image_path"]
-    #     new_Appointment.created_at = request.data["created_at"]
-    #     new_Appointment.Appointment_type = Appointment
-    #     print("REQUESTDATA", request.data)
-
-    #     print("NEW_Appointment", new_appointment)
-    #     new_appointment.save()
-
-    #     serializer = AppointmentSerializer(new_appointment, context={'request': request})
-    #     return Response(serializer.data)
+        serializer = AppointmentSerializer(new_appointment, context={'request': request})
+        return Response(serializer.data)
 
     def patch(self, request, pk=None):
         try:
@@ -81,3 +74,11 @@ class Appointments(ViewSet):
 
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ClientAppointments(ViewSet):
+    def list(self, request):
+        print(request.auth)
+        appointments = Appointment.objects.all()
+        serializer = AppointmentSerializer(appointments, many=True, context={'request': request})
+        return Response(serializer.data)
