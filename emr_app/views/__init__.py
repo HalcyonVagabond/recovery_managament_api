@@ -8,3 +8,5 @@ from .authenticate import register_client
 from .authenticate import login_provider
 from .appointment import Appointments
 from .appointment import ClientAppointments
+from .note_template import NoteTemplates
+from .note import Notes

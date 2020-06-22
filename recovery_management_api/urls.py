@@ -29,6 +29,8 @@ router.register(r'provider_client', ProviderClients, 'providerclient')
 router.register(r'provider_type', ProviderTypes, 'providertype')
 router.register(r'appointment', Appointments, 'appointment')
 router.register(r'client_appointment', ClientAppointments, 'clientappointment')
+router.register(r'note_template', NoteTemplates, 'notetemplate')
+router.register(r'note', Notes, 'note')
 
 urlpatterns = [
     path('', include(router.urls)),

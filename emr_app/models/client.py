@@ -13,6 +13,7 @@ class Client(models.Model):
     birth_date = models.DateField(auto_now=False)
     height = models.CharField(max_length=5)
     weight = models.IntegerField()
+    gender = models.CharField(max_length=55)
 
     class Meta:
         ordering = (F('id').asc(nulls_last=True),)

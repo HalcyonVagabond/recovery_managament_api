@@ -37,7 +37,7 @@ class Appointments(ViewSet):
 
     def create(self, request):
         new_appointment = Appointment()
-        print(request)
+        print("Request Data!", request.data)
         provider = Provider.objects.get(user=request.auth.user)
         client = Client.objects.get(id=request.data["client_id"])
 
