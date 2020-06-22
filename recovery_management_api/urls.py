@@ -14,8 +14,30 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
+from rest_framework.authtoken.views import obtain_auth_token
+from emr_app.views import *
+
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'user', Users, 'user')
+router.register(r'provider', Providers, 'provider')
+router.register(r'client', Clients, 'client')
+router.register(r'provider_client', ProviderClients, 'providerclient')
+router.register(r'provider_type', ProviderTypes, 'providertype')
+router.register(r'appointment', Appointments, 'appointment')
+router.register(r'client_appointment', ClientAppointments, 'clientappointment')
+router.register(r'note_template', NoteTemplates, 'notetemplate')
+router.register(r'note', Notes, 'note')
 
 urlpatterns = [
+    path('', include(router.urls)),
+    path('api-token-auth/', obtain_auth_token),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
+    path('register-provider/', register_provider),
+    path('register-client/', register_client),
+    path('login/', login_provider)
 ]

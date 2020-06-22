@@ -10,8 +10,10 @@ class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=55)
     address = models.CharField(max_length=255)
-    birth_date = models.DateTimeField(auto_now=False)
-    height = models.IntegerField()
+    birth_date = models.DateField(auto_now=False)
+    height = models.CharField(max_length=5)
+    weight = models.IntegerField()
+    gender = models.CharField(max_length=55)
 
     class Meta:
         ordering = (F('id').asc(nulls_last=True),)
