@@ -1,9 +1,11 @@
+import json
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from ..models import Note, Provider, Client, NoteTemplate
+
 
 class NoteSerializer(serializers.HyperlinkedModelSerializer):
     
@@ -36,7 +38,6 @@ class Notes(ViewSet):
 
     def create(self, request):
         new_note = Note()
-        print("Request Data!", request.data)
         provider = Provider.objects.get(user=request.auth.user)
         client = Client.objects.get(id=request.data["client_id"])
         note_template = NoteTemplate.objects.get(id=request.data["note_template_id"])
@@ -52,10 +53,20 @@ class Notes(ViewSet):
         serializer = NoteSerializer(new_note, context={'request': request})
         return Response(serializer.data)
 
-    def patch(self, request, pk=None):
+    def update(self, request, pk=None):
+        print("RREEEEQQQQ*************",request)
+        req_body = json.loads(request.body.decode())
         try:
             note = Note.objects.get(pk=pk)
-            note.date_time = request.data["date_time"]
+            provider = Provider.objects.get(user=request.auth.user)
+            client = Client.objects.get(id=note.client_id)
+            note_template = NoteTemplate.objects.get(id=note.note_template_id)
+            
+            note.provider = provider
+            note.client = client
+            note.note_template = note_template
+            note.date_time = req_body["date_time"]
+            note.content = req_body["content"]
             serializer = NoteSerializer(note, context={'request': request}, partial=True)
             note.save()
             return Response(status=status.HTTP_201_CREATED, data=serializer.data)
