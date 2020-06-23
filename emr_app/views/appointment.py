@@ -51,9 +51,12 @@ class Appointments(ViewSet):
         serializer = AppointmentSerializer(new_appointment, context={'request': request})
         return Response(serializer.data)
 
-    def patch(self, request, pk=None):
+    def update(self, request, pk=None):
         try:
             appointment = Appointment.objects.get(pk=pk)
+            provider = Provider.objects.get(user=request.auth.user)
+            client = Client.objects.get(id=request.data["client_id"])
+            appointment.duration = request.data["duration"]
             appointment.date_time = request.data["date_time"]
             serializer = AppointmentSerializer(appointment, context={'request': request}, partial=True)
             appointment.save()

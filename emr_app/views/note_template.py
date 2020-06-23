@@ -20,7 +20,7 @@ class NoteTemplates(ViewSet):
 
     def list(self, request):
         note_templates = NoteTemplate.objects.all()
-        serializer = NoteTypeSerializer(note_templates, many=True, context={'request': request})
+        serializer = NoteTemplateSerializer(note_templates, many=True, context={'request': request})
         return Response(serializer.data)
 
 
