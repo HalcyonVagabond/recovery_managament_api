@@ -25,6 +25,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'user', Users, 'user')
 router.register(r'provider', Providers, 'provider')
 router.register(r'client', Clients, 'client')
+router.register(r'unassigned_clients', UnassignedClients, 'unassignedclient')
 router.register(r'provider_client', ProviderClients, 'providerclient')
 router.register(r'provider_type', ProviderTypes, 'providertype')
 router.register(r'appointment', Appointments, 'appointment')
@@ -37,7 +38,8 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('register-provider/', register_provider),
-    path('register-client/', register_client),
-    path('login/', login_provider)
+    path('register_provider/', register_provider),
+    path('register_client/', register_client),
+    path('login/', login_provider),
+    path('admin_login/', login_admin)
 ]

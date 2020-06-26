@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from ..models import Appointment, Provider, Client
-
+from ..mail_test import AppointmentEmail
 
 class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
     
@@ -47,7 +47,8 @@ class Appointments(ViewSet):
         new_appointment.duration = request.data["duration"]
 
         new_appointment.save()
-
+        AppointmentEmail().created_appointment(new_appointment)
+        
         serializer = AppointmentSerializer(new_appointment, context={'request': request})
         return Response(serializer.data)
 
@@ -60,6 +61,7 @@ class Appointments(ViewSet):
             appointment.date_time = request.data["date_time"]
             serializer = AppointmentSerializer(appointment, context={'request': request}, partial=True)
             appointment.save()
+            AppointmentEmail().edited_appointment(appointment)
             return Response(status=status.HTTP_201_CREATED, data=serializer.data)
             
         except appointment.DoesNotExist as ex:
@@ -68,6 +70,8 @@ class Appointments(ViewSet):
     def destroy(self, request, pk=None):
         try:
             appointment = Appointment.objects.get(pk=pk)
+            clone = appointment
+            AppointmentEmail().canceled_appointment(clone)
             appointment.delete()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -85,3 +89,4 @@ class ClientAppointments(ViewSet):
         appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True, context={'request': request})
         return Response(serializer.data)
+

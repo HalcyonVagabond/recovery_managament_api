@@ -24,7 +24,7 @@ class ProviderClients(ViewSet):
     def retrieve(self, request, pk=None):
         try:
             provider = Provider.objects.get(pk=pk)
-            serializer = ProviderSerializer(
+            serializer = ProviderClientSerializer(
                 provider, context={
                     'request': request
                 }
@@ -48,8 +48,8 @@ class ProviderClients(ViewSet):
         
     def create(self, request):
         req_body = json.loads(request.body.decode())
-        
-        provider = Provider.objects.get(pk=req_body['provider_id'])
+
+        provider = Provider.objects.get(user=request.auth.user)
         client = Client.objects.get(pk=req_body['client_id'])
         
         new_provider_client = ProviderClient()
@@ -60,3 +60,16 @@ class ProviderClients(ViewSet):
 
         serializer = ProviderClientSerializer(new_provider_client, context={'request': request})
         return Response(serializer.data)
+
+    def destroy(self, request, pk=None):
+        try:
+            provider_client = ProviderClient.objects.get(pk=pk)
+            provider_client.delete()
+
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        except provider_client.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
