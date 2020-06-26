@@ -82,3 +82,23 @@ def login_provider(request):
         else: 
             data = json.dumps({"valid": False, 'request': req_body})
             return HttpResponse(data, content_type="application/json")
+
+@csrf_exempt
+def login_admin(request): 
+    req_body = json.loads(request.body.decode())
+
+    if request.method == 'POST': 
+        email = req_body['email']
+        user_obj = User.objects.filter(email=email)
+        username = user_obj[0]
+        password = req_body['password']
+        authenticated_user = authenticate(username=username, password=password)
+        # If the authenticated user already exists
+        if authenticated_user is not None and authenticated_user.is_superuser: 
+            # Retrieve their token
+            token = Token.objects.get(user=authenticated_user)
+            data = json.dumps({"valid": True, "token": token.key, "provider_id": authenticated_user.provider.id, "admin": authenticated_user.id})
+            return HttpResponse(data, content_type="application/json")
+        else: 
+            data = json.dumps({"valid": False, 'request': req_body})
+            return HttpResponse(data, content_type="application/json")
