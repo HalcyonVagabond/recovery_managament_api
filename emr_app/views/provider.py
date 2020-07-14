@@ -14,7 +14,7 @@ class ProviderSerializer(serializers.HyperlinkedModelSerializer):
             view_name='provider',
             lookup_field='id'
         )
-        fields = ('id', 'phone_number')
+        fields = ('id', 'user_id', 'user', 'phone_number', 'practice_name', 'practice_address', 'provider_type_id','provider_type')
         depth = 1
 
 
