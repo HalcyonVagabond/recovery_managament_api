@@ -3,6 +3,7 @@ from .provider import Providers
 from .client import Clients
 from .client import UnassignedClients
 from .provider_client import ProviderClients
+from .provider_client import ClientsProviders
 from .provider_type import ProviderTypes
 from .authenticate import register_provider
 from .authenticate import register_client
@@ -10,5 +11,6 @@ from .authenticate import login_provider
 from .authenticate import login_admin
 from .appointment import Appointments
 from .appointment import ClientAppointments
+from .appointment import ReminderEmail
 from .note_template import NoteTemplates
 from .note import Notes

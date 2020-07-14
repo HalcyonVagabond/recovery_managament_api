@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework import status
 from ..models import Appointment, Provider, Client
 from ..mail_test import AppointmentEmail
+import copy
 
 class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
     
@@ -37,7 +38,6 @@ class Appointments(ViewSet):
 
     def create(self, request):
         new_appointment = Appointment()
-        print("Request Data!", request.data)
         provider = Provider.objects.get(user=request.auth.user)
         client = Client.objects.get(id=request.data["client_id"])
 
@@ -68,25 +68,33 @@ class Appointments(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def destroy(self, request, pk=None):
+        appointment = Appointment.objects.get(pk=pk)
+        # AppointmentEmail().canceled_appointment(appointment)
         try:
-            appointment = Appointment.objects.get(pk=pk)
-            clone = appointment
-            AppointmentEmail().canceled_appointment(clone)
             appointment.delete()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
         except appointment.DoesNotExist as ex:
-            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message appointment does not exist': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as ex:
-            return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message exception': ex.args}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ClientAppointments(ViewSet):
     def list(self, request):
-        print(request.auth)
         appointments = Appointment.objects.all()
         serializer = AppointmentSerializer(appointments, many=True, context={'request': request})
         return Response(serializer.data)
 
+class ReminderEmail(ViewSet):
+    def retrieve(self, request, pk=None):
+        try:
+            appointment = Appointment.objects.get(pk=pk)
+            AppointmentEmail().reminder_email(appointment)
+            serializer = AppointmentSerializer(appointment, context={'request': request})
+            return Response(serializer.data)
+        except Exception as ex:
+            return HttpResponseServerError(ex)
+    

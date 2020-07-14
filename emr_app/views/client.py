@@ -55,7 +55,6 @@ class UnassignedClients(ViewSet):
             if client.id not in p_c_ids:
                 unassignedClients.append(client)
         
-        print(unassignedClients)
         serializer = ClientSerializer(
             unassignedClients,
             many=True,
