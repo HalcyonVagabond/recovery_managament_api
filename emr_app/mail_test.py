@@ -1,6 +1,15 @@
 import os
 import smtplib
 from datetime import datetime
+import random
+import string
+
+def random_string(stringLength=20):
+    letters = string.hexdigits
+    
+    return ''.join(random.choice(letters) for i in range(stringLength))
+
+random_link = random_string()
 
 email_address = os.environ.get("EMR_GMAIL_NAME")
 email_password = os.environ.get("EMR_GMAIL_PASSWORD")
@@ -12,7 +21,7 @@ class AppointmentEmail():
     """ Use the following command in terminal to create 
         a simulated email server . . . 
 
-        python3 -m smtpd -c DebuggingServer -n localhost:1010
+        python3 -m smtpd -c DebuggingServer -n localhost:1025
     
         Change the function call from send_simulated_email, to 
         send_email in order to send real emails to recipients.
@@ -28,7 +37,7 @@ class AppointmentEmail():
             smtp.sendmail(email_address, recipient_email, message)
     
     def send_simulated_email(self, recipient_email, message):
-        with smtplib.SMTP('localhost', 1010) as smtp:
+        with smtplib.SMTP('localhost', 1025) as smtp:
             smtp.sendmail(email_address, recipient_email, message)
 
     def created_appointment(self, appointment_data):
@@ -42,9 +51,11 @@ class AppointmentEmail():
         time = datetime.strftime(datetimeObject, "%I:%M %p")
         print(f'Your appointment is on {day} {date}, at {time}')
         subject = f'New appointment for {appointment_data.client.user.first_name}!'
-        body = f'Hello, {appointment_data.client.user.first_name}.\n\nYou have been scheduled for an appointment with {appointment_data.provider.user.first_name} {appointment_data.provider.user.last_name} on {day}, {date}, at {time}. It is scheduled to last {appointment_data.duration} minutes.\n\n Please contact your provider at {appointment_data.provider.user.email} at least 24 hours before your appointment if you need to cancel or reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
+        body = f'Hello, {appointment_data.client.user.first_name}.\n\nYou have been scheduled for an telehealth appointment with {appointment_data.provider.user.first_name} {appointment_data.provider.user.last_name} on {day}, {date}, at {time}. It is scheduled to last {appointment_data.duration} minutes.\n\nFollow this link and sign in to join your provider: \n telehealth.evolvingrecovery.com/{random_link} \n\nPlease contact your provider at {appointment_data.provider.user.email} at least 24 hours before your appointment if you need to cancel or reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)
+        self.send_email(client.user.email, message)
+
 
 
 
@@ -77,5 +88,19 @@ class AppointmentEmail():
         
         subject = f'Appointment Cancelation'
         body = f'Hello, {client.user.first_name}.\n\nYour appointment with {provider.user.first_name} {provider.user.last_name}, on {day}, {date}, at {time}, has been canceled.\n\n Please contact your provider at {provider.user.email} if you would like to reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
+        message = f'Subject: {subject}\n\n{body}'
+        self.send_simulated_email(client.user.email, message)
+
+    def reminder_email(self, appointment_data):
+        provider = appointment_data.provider
+        client = appointment_data.client
+        print(appointment_data.date_time)
+        datetimeObject = appointment_data.date_time
+        day = datetime.strftime(datetimeObject, '%A')
+        date = datetime.strftime(datetimeObject, "%B %d, %Y")
+        time = datetime.strftime(datetimeObject, "%I:%M %p")
+        print(f'Your appointment is on {day}, {date}, at {time}')
+        subject = f'Appointment Reminder for {client.user.first_name}'
+        body = f'Hello, {client.user.first_name}.\n\nThis is a reminder for your appointment with {provider.user.first_name} {provider.user.last_name}, on {day}, {date}, at {time}.\n\n Please contact your provider at {provider.user.email} if you need to reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)

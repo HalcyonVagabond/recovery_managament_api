@@ -15,7 +15,7 @@ class ProviderClientSerializer(serializers.HyperlinkedModelSerializer):
             view_name='providerclient',
             lookup_field='id'
         )
-        fields = ('id', 'provider_id', 'client_id', 'client')
+        fields = ('id', 'provider_id', 'client_id', 'client', 'provider')
         depth = 2
 
 
@@ -73,3 +73,19 @@ class ProviderClients(ViewSet):
 
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ClientsProviders(ViewSet):
+    def list(self, request):
+        try:
+            client_id = self.request.query_params.get('client_id')
+
+            clients_providers = ProviderClient.objects.filter(client_id=client_id)
+            print("clients providers****", len(clients_providers))
+            serializer = ProviderClientSerializer(
+                clients_providers,
+                many=True,
+                context={'request': request}
+            )
+            return Response(serializer.data)
+        except Exception as ex:
+            return HttpResponseServerError(ex)
