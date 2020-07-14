@@ -66,10 +66,10 @@ def register_client(request):
 @csrf_exempt
 def login_provider(request): 
     req_body = json.loads(request.body.decode())
-
     if request.method == 'POST': 
         email = req_body['email']
         user_obj = User.objects.filter(email=email)
+        print("UNERSER OBBJECT****", user_obj)
         username = user_obj[0]
         password = req_body['password']
         authenticated_user = authenticate(username=username, password=password)
