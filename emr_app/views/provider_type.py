@@ -27,3 +27,13 @@ class ProviderTypes(ViewSet):
         provider_types = ProviderType.objects.all()
         serializer = ProviderTypeSerializer(provider_types, many=True, context={'request': request})
         return Response(serializer.data)
+
+    def create(self, request):
+        provider_type = ProviderType()
+        
+        provider_type.name = request.data["name"]
+
+        provider_type.save()
+
+        serializer = ProviderTypeSerializer(provider_type, context={'request': request})
+        return Response(serializer.data)
