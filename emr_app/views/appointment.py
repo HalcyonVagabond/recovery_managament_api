@@ -7,6 +7,8 @@ from rest_framework import status
 from ..models import Appointment, Provider, Client
 from ..mail_test import AppointmentEmail
 import copy
+import random
+import string
 
 class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
     
@@ -16,7 +18,7 @@ class AppointmentSerializer(serializers.HyperlinkedModelSerializer):
             view_name='appointment',
             lookup_field='id'
         )
-        fields = ('id', 'date_time', 'duration', 'provider_id', 'client_id', 'client')
+        fields = ('id', 'date_time', 'duration', 'provider_id', 'client_id', 'client', 'appointment_url')
         depth = 2
 
 class Appointments(ViewSet):
@@ -45,7 +47,12 @@ class Appointments(ViewSet):
         new_appointment.client = client
         new_appointment.date_time = request.data["date_time"]
         new_appointment.duration = request.data["duration"]
-
+        new_appointment.virtual_boolean = True
+        if new_appointment.virtual_boolean == True:
+            def random_string(stringLength=20):
+                letters = string.hexdigits
+                return ''.join(random.choice(letters) for i in range(stringLength))
+            new_appointment.appointment_url = f'telehealth.evolvingrecovery.com/{random_string()}'
         new_appointment.save()
         AppointmentEmail().created_appointment(new_appointment)
         
