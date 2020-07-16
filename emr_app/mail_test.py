@@ -51,13 +51,10 @@ class AppointmentEmail():
         time = datetime.strftime(datetimeObject, "%I:%M %p")
         print(f'Your appointment is on {day} {date}, at {time}')
         subject = f'New appointment for {appointment_data.client.user.first_name}!'
-        body = f'Hello, {appointment_data.client.user.first_name}.\n\nYou have been scheduled for an telehealth appointment with {appointment_data.provider.user.first_name} {appointment_data.provider.user.last_name} on {day}, {date}, at {time}. It is scheduled to last {appointment_data.duration} minutes.\n\nFollow this link and sign in to join your provider: \n telehealth.evolvingrecovery.com/{random_link} \n\nPlease contact your provider at {appointment_data.provider.user.email} at least 24 hours before your appointment if you need to cancel or reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
+        body = f'Hello, {appointment_data.client.user.first_name}.\n\nYou have been scheduled for an telehealth appointment with {appointment_data.provider.user.first_name} {appointment_data.provider.user.last_name} on {day}, {date}, at {time}. It is scheduled to last {appointment_data.duration} minutes.\n\nFollow this link and sign in to join your provider: \n {appointment_data.appointment_url} \n\nPlease contact your provider at {appointment_data.provider.user.email} at least 24 hours before your appointment if you need to cancel or reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)
         self.send_email(client.user.email, message)
-
-
-
 
     def edited_appointment(self, appointment_data):
         print('editing appointment')
@@ -74,6 +71,7 @@ class AppointmentEmail():
         body = f'Hello, {client.user.first_name}.\n\nYour appointment with {provider.user.first_name} {provider.user.last_name} has been rescheduled to {day}, {date}, at {time}. It is scheduled to last {appointment_data.duration} minutes.\n\n Please contact your provider at {provider.user.email} at least 24 hours before your appointment if you need to cancel or reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)
+        self.send_email(client.user.email, message)
         
     def canceled_appointment(self, appointment_data):
         print('Canceling appointment')
@@ -90,6 +88,7 @@ class AppointmentEmail():
         body = f'Hello, {client.user.first_name}.\n\nYour appointment with {provider.user.first_name} {provider.user.last_name}, on {day}, {date}, at {time}, has been canceled.\n\n Please contact your provider at {provider.user.email} if you would like to reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)
+        self.send_email(client.user.email, message)
 
     def reminder_email(self, appointment_data):
         provider = appointment_data.provider
@@ -104,3 +103,4 @@ class AppointmentEmail():
         body = f'Hello, {client.user.first_name}.\n\nThis is a reminder for your appointment with {provider.user.first_name} {provider.user.last_name}, on {day}, {date}, at {time}.\n\n Please contact your provider at {provider.user.email} if you need to reschedule.\n\nBe Well,\n\nEvolving Recovery Team'
         message = f'Subject: {subject}\n\n{body}'
         self.send_simulated_email(client.user.email, message)
+        self.send_email(client.user.email, message)
